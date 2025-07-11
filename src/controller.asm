@@ -222,7 +222,7 @@ remaining_loop:
 
   LDA #3
   STA ball_dx
-  LDA #1
+  LDA #4
   STA ball_dy
 
   RTS
@@ -270,37 +270,37 @@ remaining_loop:
 
 .proc update_ball
 ; now move our ball
- 	lda oam + (1 * 4) + 0 ; get the current Y
+ 	lda ball_y ; get the current Y
 	clc
 	adc ball_dy ; add the Y velocity
- 	sta oam + (1 * 4) + 0 ; write the change
+ 	sta ball_y ; write the change
  	cmp #0 ; have we hit the top border
  	bne NOT_HITTOP
  		lda #1 ; reverse direction
  		sta ball_dy
  NOT_HITTOP:
- 	lda oam + (1 * 4) + 0
+ 	lda ball_y
  	cmp #210 ; have we hit the bottom border
  	bne NOT_HITBOTTOM
  		lda #$FF ; reverse direction (-1)
  		sta ball_dy
  NOT_HITBOTTOM:
- 	lda oam + (1 * 4) + 3 ; get the current x
+ 	lda ball_x ; get the current x
  	clc
  	adc ball_dx	; add the X velocity
- 	sta oam + (1 * 4) + 3
+ 	sta ball_x
  	cmp #0 ; have we hit the left border
  	bne NOT_HITLEFT
  		lda #1 ; reverse direction
  		sta ball_dx
  NOT_HITLEFT:
- 	lda oam + (1 * 4) + 3
+ 	lda ball_x
  	cmp #248 ; have we hit the right border
  	bne NOT_HITRIGHT
  		lda #$FF ; reverse direction (-1)
  		sta ball_dx
  NOT_HITRIGHT:
- 	RTS
+
 .endproc
 
 .proc update_player
