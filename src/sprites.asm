@@ -28,7 +28,8 @@
 .segment "ZEROPAGE"
 gamepad:		.res 1 ; stores the current gamepad values
 
-
+d_x:			  .res 1 ; x velocity of ball
+d_y:			  .res 1 ; y velocity of ball
 
 ;*****************************************************************
 ; OAM (Object Attribute Memory) ($0200–$02FF)
@@ -185,8 +186,8 @@ remaining_loop:
 
 .proc init_sprites
 
-  set_sprite oam, 0, 7, 0, (SPRITE_PALETTE_0), 8
-  set_sprite oam, 1, 7, 1, (SPRITE_PALETTE_0), 16
+  set_sprite oam, 0, 8, 0, (SPRITE_PALETTE_0), 8
+  set_sprite oam, 1, 8, 1, (SPRITE_PALETTE_0), 16
 
   RTS
 .endproc

@@ -9765,6 +9765,14 @@
     "Items": [
       {
         "RomFile": {
+          "Path": "C:\\Users\\pillar\\Desktop\\nes-dev\\projects\\src/controller.nes",
+          "InnerFile": "",
+          "InnerFileIndex": 0
+        },
+        "PatchFile": null
+      },
+      {
+        "RomFile": {
           "Path": "C:\\Users\\pillar\\Desktop\\nes-dev\\projects\\src/sprites.nes",
           "InnerFile": "",
           "InnerFileIndex": 0
@@ -9871,8 +9879,8 @@
       "Height": 505
     },
     "WindowLocation": {
-      "X": 947,
-      "Y": 437
+      "X": 1280,
+      "Y": 294
     },
     "WindowIsMaximized": false
   },
