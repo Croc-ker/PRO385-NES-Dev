@@ -66,6 +66,13 @@ seconds:                .res 1    ; Seconds
 ; Reserve remaining space in this section if needed
                         .res 07   ; Pad to $30 (optional)
 
+rock_x:                .res 1
+rock_y:                .res 1
+rock_active:           .res 1
+rock2_x:               .res 1
+rock2_y:               .res 1
+rock2_active:          .res 1
+
 ;*****************************************************************
 ; OAM (Object Attribute Memory) ($0200–$02FF)
 ;*****************************************************************
@@ -91,7 +98,6 @@ oam: .res 256	; sprite OAM data
 
 ; Non-Maskable Interrupt Handler - called during VBlank
 .proc nmi_handler
-
   RTI                     ; Return from interrupt (not using NMI yet)
 .endproc
 
@@ -189,13 +195,13 @@ remaining_loop:
 
 .proc init_sprites
   ; set sprite tiles
-  LDA #1
+  LDA #$0E
   STA SPRITE_0_ADDR + SPRITE_OFFSET_TILE
-  LDA #2
+  LDA #$0F
   STA SPRITE_1_ADDR + SPRITE_OFFSET_TILE
-  LDA #3
+  LDA #$1E
   STA SPRITE_2_ADDR + SPRITE_OFFSET_TILE
-  LDA #4
+  LDA #$1F
   STA SPRITE_3_ADDR + SPRITE_OFFSET_TILE
 
   LDA #20
@@ -203,6 +209,10 @@ remaining_loop:
 
   LDA #30
   STA player_x
+
+  LDA #$00
+  STA rock_active
+  STA rock2_active
 
   RTS
 .endproc
@@ -236,11 +246,23 @@ remaining_loop:
   STA SPRITE_2_ADDR + SPRITE_OFFSET_Y
   STA SPRITE_3_ADDR + SPRITE_OFFSET_Y
 
-  ;LDA #$00
-  ;STA PPU_SCROLL                         ; Write horizontal scroll
-  ;DEC scroll
-  ;LDA scroll
-  ;STA PPU_SCROLL                         ; Write vertical scroll
+  LDA rock_y
+  STA oam+16
+  LDA #$11
+  STA oam+17
+  LDA #$00
+  STA oam+18
+  LDA rock_x
+  STA oam+19
+
+  LDA rock2_y
+  STA oam+20
+  LDA #$11
+  STA oam+21
+  LDA #$00
+  STA oam+22
+  LDA rock2_x
+  STA oam+23
 
   ; Set OAM address to 0 — required before DMA or manual OAM writes
   LDA #$00
@@ -254,13 +276,89 @@ remaining_loop:
   RTS
 
 .endproc
+; https://www.nesdev.org/wiki/APU_Pulse
+; https://www.nesdev.org/wiki/APU_registers
+; actual hell to figure out. i no longer like retro dev stuff.
+
+.proc update_rock1
+  LDA rock_active
+  BNE move_rock1
+
+  LDA #$F0
+  STA rock_x
+  LDA player_y
+  STA rock_y
+  LDA #$01
+  STA rock_active
+
+  LDA #%10001001
+  STA $4000
+  LDA #$FD
+  STA $4002
+  LDA #$08
+  STA $4003
+  LDA #%00000001
+  STA $4015
+
+  RTS
+
+move_rock1:
+  LDA rock_x
+  SEC
+  SBC #4
+  STA rock_x
+
+  CMP #$10
+  BCS still_on_screen1
+  LDA #$00
+  STA rock_active
+
+still_on_screen1:
+  RTS
+.endproc
+
+.proc update_rock2
+  LDA rock2_active
+  BNE move_rock2
+
+  LDA #$F0
+  STA rock2_x
+  LDA player_y
+  STA rock2_y
+  LDA #$01
+  STA rock2_active
+
+  LDA #%10001001
+  STA $4000
+  LDA #$FD
+  STA $4002
+  LDA #$08
+  STA $4003
+  LDA #%00000001
+  STA $4015
+
+  RTS
+
+move_rock2:
+  LDA rock2_x
+  SEC
+  SBC #2
+  STA rock2_x
+
+  CMP #$10
+  BCS still_on_screen2
+  LDA #$00
+  STA rock2_active
+
+still_on_screen2:
+  RTS
+.endproc
 
 .proc update_player
     LDA controller_1
     AND #PAD_L
     BEQ not_left
       LDA player_x
-      ;DEX
       SEC
       SBC #$01
       STA player_x
@@ -289,9 +387,54 @@ not_left:
       ADC #$01
       STA player_y
   not_down:
-    RTS                       ; Return to caller
+    RTS
 .endproc
 
+.proc check_collision
+    LDA rock_active
+    BEQ check_rock2
+    LDA rock_x
+    SEC
+    SBC player_x
+    BMI check_rock2
+    CMP #16
+    BCS check_rock2
+    LDA rock_y
+    SEC
+    SBC player_y
+    BMI check_rock2
+    CMP #16
+    BCS check_rock2
+    JMP freeze
+check_rock2:
+    LDA rock2_active
+    BEQ no_collision
+    LDA rock2_x
+    SEC
+    SBC player_x
+    BMI no_collision
+    CMP #16
+    BCS no_collision
+    LDA rock2_y
+    SEC
+    SBC player_y
+    BMI no_collision
+    CMP #16
+    BCS no_collision
+    JMP freeze
+freeze:
+    LDA #%10001001
+    STA $4000
+    LDA #$FD
+    STA $4002
+    LDA #$08
+    STA $4003
+    LDA #%00000001
+    STA $4015
+    JMP freeze
+no_collision:
+    RTS
+.endproc
 ;******************************************************************************
 ; Procedure: main
 ;------------------------------------------------------------------------------
@@ -328,6 +471,10 @@ forever:
     ; Read controller
     JSR read_controller
     JSR update_player
+
+    JSR update_rock1
+    JSR update_rock2
+    JSR check_collision
 
     ; Update sprite data (DMA transfer to PPU OAM)
     JSR update_sprites
@@ -418,7 +565,7 @@ no_feedback:
 ;*****************************************************************
 .segment "CHARS"
 ; Load CHR data
-  .incbin "assets/tiles.chr"
+  .incbin "assets/game/tiles.chr"
 
 ;*****************************************************************
 ; Character ROM data (graphics patterns)
@@ -426,10 +573,10 @@ no_feedback:
 .segment "RODATA"
 ; Load palette data
 palette_data:
-  .incbin "assets/palette.pal"
+  .incbin "assets/game/palette.pal"
 ; Load nametable data
 nametable_data:
-  .incbin "assets/screen.nam"
+  .incbin "assets/game/screen.nam"
 
 hello_txt:
 .byte 'H','E','L','L', 'O', 0

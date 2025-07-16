@@ -33,6 +33,12 @@ PAD_D               = $04
 PAD_L               = $02
 PAD_R               = $01
 
+; OAM Sprite Byte Offset
+SPRITE_OFFSET_Y       = 0
+SPRITE_OFFSET_TILE    = 1
+SPRITE_OFFSET_ATTRIB  = 2
+SPRITE_OFFSET_X       = 3
+
 ; Useful PPU memory addresses
 NAME_TABLE_0_ADDRESS		  = $2000
 ATTRIBUTE_TABLE_0_ADDRESS	= $23C0

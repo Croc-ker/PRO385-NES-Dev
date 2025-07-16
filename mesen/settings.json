@@ -1454,18 +1454,18 @@
         "MouseButtons": null,
         "OekakidsButtons": null,
         "BandaiHypershotButtons": null,
-        "A": 0,
-        "B": 0,
+        "A": 144,
+        "B": 142,
         "X": 0,
         "Y": 0,
         "L": 0,
         "R": 0,
-        "Up": 0,
-        "Down": 0,
-        "Left": 0,
-        "Right": 0,
-        "Start": 0,
-        "Select": 0,
+        "Up": 24,
+        "Down": 26,
+        "Left": 23,
+        "Right": 25,
+        "Start": 117,
+        "Select": 6,
         "U": 0,
         "D": 0,
         "TurboA": 0,
@@ -8669,8 +8669,8 @@
         "Height": 550
       },
       "WindowLocation": {
-        "X": 130,
-        "Y": 130
+        "X": 1019,
+        "Y": 362
       },
       "WindowIsMaximized": false
     },
@@ -9765,6 +9765,30 @@
     "Items": [
       {
         "RomFile": {
+          "Path": "C:\\Users\\pillar\\Desktop\\nes-dev\\projects/src/game.nes",
+          "InnerFile": "",
+          "InnerFileIndex": 0
+        },
+        "PatchFile": null
+      },
+      {
+        "RomFile": {
+          "Path": "C:\\Users\\pillar\\Desktop\\nes-dev\\projects\\src/game.nes",
+          "InnerFile": "",
+          "InnerFileIndex": 0
+        },
+        "PatchFile": null
+      },
+      {
+        "RomFile": {
+          "Path": "C:\\Users\\pillar\\Desktop\\nes-dev\\projects\\src\\pong.nes",
+          "InnerFile": "",
+          "InnerFileIndex": 0
+        },
+        "PatchFile": null
+      },
+      {
+        "RomFile": {
           "Path": "C:\\Users\\pillar\\Desktop\\nes-dev\\projects\\src/controller.nes",
           "InnerFile": "",
           "InnerFileIndex": 0
@@ -9879,8 +9903,8 @@
       "Height": 505
     },
     "WindowLocation": {
-      "X": 934,
-      "Y": 395
+      "X": 454,
+      "Y": 381
     },
     "WindowIsMaximized": false
   },
